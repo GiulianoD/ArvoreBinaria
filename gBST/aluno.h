@@ -3,7 +3,7 @@
 
 #include "func/aluno.c"
 
-Aluno *criaAluno(int mat, char *nome, float nota);
+Aluno *criaAluno(int mat, char *nome, int nota);
 int compara(void* a, void* b);
 void imprimeElemento(void* a);
 

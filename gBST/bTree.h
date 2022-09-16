@@ -4,7 +4,7 @@
 #include "func/bTree.c"
 
 int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), void (*imprimeElemento) (void*));
-int addNoR(Controle *ctrl, void *dados);
+int addNo(Controle *ctrl, void *dados);
 void imprimeArvEmOrdem(Controle *ctrl);
 int editaElemento(Controle *ctrl, void *encontra, void *novosDados);
 int deletaNo(Controle *ctrl, void *remov);

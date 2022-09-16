@@ -25,33 +25,60 @@ int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), 
     return 1;
 }
 
-No *addNoRPt2(Controle *ctrl, No *no, void *dados, int *resultado){
-    if (!no){
-        No *novoNo = (No*) malloc (sizeof(No));
-        if (!novoNo) *resultado = -1;
-        novoNo->dados = malloc(ctrl->size);
-        if (!novoNo->dados) *resultado = -1;
+No *criaNo(Controle *ctrl, void *dados, int *resultado){
+    No *novoNo = (No*) malloc (sizeof(No));
+    if (!novoNo) *resultado = -1;
+    novoNo->dados = malloc(ctrl->size);
+    if (!novoNo->dados) *resultado = -1;
 
-        memcpy(novoNo->dados, dados, ctrl->size);
-        novoNo->filhoDir = NULL;
-        novoNo->filhoEsq = NULL;
-        ctrl->totalNos++;
-        return novoNo;
+    memcpy(novoNo->dados, dados, ctrl->size);
+    novoNo->filhoDir = NULL;
+    novoNo->filhoEsq = NULL;
+    ctrl->totalNos++;
+    return novoNo;
+}
+
+No *addNoI(Controle *ctrl, No *raiz, void *dados, int *resultado){
+    No **noAux = &raiz;
+    int resultadoComparacao;
+    while (*noAux){
+        resultadoComparacao = ctrl->compara((*noAux)->dados,dados);
+
+        if (resultadoComparacao > 0){
+            noAux = &(*noAux)->filhoEsq;
+        }
+        else if (resultadoComparacao < 0){
+            noAux = &(*noAux)->filhoDir;
+        }
+        else if(resultadoComparacao == 0){
+            //caso entre aqui, entao a matricula a ser inserida, ja existe na arvore
+            return raiz;
+        }
+    }
+    //caso encontre um elemento==NULL, sai do WHILE
+    *noAux = criaNo(ctrl, dados, resultado);
+    return raiz;
+}
+
+No *addNoR(Controle *ctrl, No *no, void *dados, int *resultado){//criada a funcao recursiva para testes
+    if (!no){
+        return criaNo(ctrl, dados, resultado);
     }
 
     if (ctrl->compara(no->dados,dados) > 0){
-        no->filhoEsq = addNoRPt2(ctrl, no->filhoEsq, dados, resultado);
+        no->filhoEsq = addNoR(ctrl, no->filhoEsq, dados, resultado);
     }
     else if (ctrl->compara(no->dados,dados) < 0){
-        no->filhoDir = addNoRPt2(ctrl, no->filhoDir, dados, resultado);
+        no->filhoDir = addNoR(ctrl, no->filhoDir, dados, resultado);
     }
 
     return no;
 }
 
-int addNoR(Controle *ctrl, void *dados){
+int addNo(Controle *ctrl, void *dados){
     int resultado = 0;
-    ctrl->raiz = addNoRPt2(ctrl, ctrl->raiz, dados, &resultado);
+    //ctrl->raiz = addNoR(ctrl, ctrl->raiz, dados, &resultado);
+    ctrl->raiz = addNoI(ctrl, ctrl->raiz, dados, &resultado);
     return resultado;
 }
 
@@ -83,15 +110,15 @@ int editaElemento(Controle *ctrl, void *encontra, void *novosDados){
     return -1;
 }
 
-No *deletaNoPt2(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado){
+No *deletaNoR(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado){
     if(!arvore) return NULL;
 
     No *arvoreAux = arvore;
 
     int compara = ctrl->compara(arvore->dados, remov);
 
-    if      (compara < 0) arvore->filhoDir = deletaNoPt2(ctrl, arvore->filhoDir, remov, arvore, resultado);
-    else if (compara > 0) arvore->filhoEsq = deletaNoPt2(ctrl, arvore->filhoEsq, remov, arvore, resultado);
+    if      (compara < 0) arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, remov, arvore, resultado);
+    else if (compara > 0) arvore->filhoEsq = deletaNoR(ctrl, arvore->filhoEsq, remov, arvore, resultado);
     else{
         resultado = 0;
         if (arvore->filhoEsq == NULL){
@@ -111,14 +138,14 @@ No *deletaNoPt2(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado
         No *pontoMinimo = arvore->filhoDir;
         while (pontoMinimo->filhoEsq) pontoMinimo = pontoMinimo->filhoEsq;
         arvore->dados = pontoMinimo->dados;
-        arvore->filhoDir = deletaNoPt2(ctrl, arvore->filhoDir, arvore->dados, arvore, resultado);
+        arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, arvore->dados, arvore, resultado);
     }
     return arvore;
 }
 
 int deletaNo(Controle *ctrl, void *remov){
     int resultado = 0;
-    ctrl->raiz = deletaNoPt2(ctrl, ctrl->raiz, remov, ctrl->raiz, &resultado);
+    ctrl->raiz = deletaNoR(ctrl, ctrl->raiz, remov, ctrl->raiz, &resultado);
     return resultado;
 }
 
@@ -136,4 +163,12 @@ int alturaElemento(No *raiz){
 	if (alturaE > alturaD)
 		return 1 + alturaE;
 	return 1 + alturaD;
+}
+
+void maiorElemento(){
+
+}
+
+void menorElemento(){
+
 }
