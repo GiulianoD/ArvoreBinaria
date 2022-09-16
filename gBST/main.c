@@ -6,6 +6,7 @@
 #include "aluno.h"
 
 FILE *abreArq(char *path, char *modo);
+Controle *leArquivo(Controle *ctrl, char *arqNome);
 /*
 Após a leitura e construção da árvore em memória seu programa deve exibir um menu dando as seguintes opções:
 
@@ -17,32 +18,41 @@ Sair: o programa deve percorrer a árvore usando caminhamento "em ordem" e gerar
 
 */
 int main(){
+    Controle *ctrl;
+    iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeElemento);
+    ctrl = leArquivo(ctrl, "testes.txt");
+
+    Aluno *alunoAux = criaAluno(0,"NULL",0);
+    alunoAux->matricula = 10;
+    encontraNo(ctrl,alunoAux);
+    
+    //imprimeArvEmOrdem(ctrl);
+
+    printf("Pressione enter para finalizar o programa.");
+    getchar();
+    return 0;
+}
+
+Controle *leArquivo(Controle *ctrl, char *arqNome){
+    FILE *arq = abreArq(arqNome,"r");
+    
     Aluno *alunoAux;
-    Controle *ctrlArvre;
-    char *nomearq = "entradaBalanceada10.txt";
-    FILE *arqEntrada = abreArq(nomearq, "r");
-
-    iniciaArvore(&ctrlArvre, sizeof(Aluno), compara, imprimeElemento);
-
     int matAux;
     char *nomeAux = (char*) malloc (30);
     int notaAux;
     int totalEsperadoDeElementos;
 
-    fscanf(arqEntrada, "%d\n", &totalEsperadoDeElementos);
-    while (fscanf(arqEntrada, "%d;%[^;];%d\n", &matAux, nomeAux, &notaAux) != -1){
+    fscanf(arq, "%d\n", &totalEsperadoDeElementos);
+    while (fscanf(arq, "%d;%[^;];%d\n", &matAux, nomeAux, &notaAux) != -1){
         //printf("Aluno cadastrado: %s, da matricula: %d, tem a nota %d.\n", nomeAux, matAux, notaAux);
         alunoAux = criaAluno(matAux, nomeAux, notaAux);
-        addNo(ctrlArvre, alunoAux);
+        addNo(ctrl, alunoAux);
     }
-    
-    fclose(arqEntrada);
-
-    printf("Total de nos aguardados: %d\n", totalEsperadoDeElementos);
-
-    imprimeArvEmOrdem(ctrlArvre);
-
-    return 0;
+    //printf("Total de nos aguardados: %d\n", totalEsperadoDeElementos);
+    //printf("Total de nos  guardados: %d\n", ctrl->totalNos);
+    //printf("Total de nos  da funcao: %d\n", totalNo(ctrl->raiz));
+    fclose(arq);
+    return ctrl;
 }
 
 FILE *abreArq(char *path, char *modo){

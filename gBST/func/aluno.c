@@ -24,5 +24,7 @@ int compara(void* a, void* b){
 
 void imprimeElemento(void* a){
     Aluno *a1= (Aluno*) a;
-    printf("%d - %s - %d\n", a1->matricula, a1->nome, a1->nota);
+    printf("Estudante: %s\n", a1->nome);
+    printf("Matricula: %d\n", a1->matricula);
+    printf("Nota: %d\n", a1->nota);
 }

@@ -9,10 +9,10 @@ typedef struct controle {
     int altura;
     int totalNos;
     int (*compara) (void*,void*);
-    void (*imprimeElemento) (void*);
+    void (*imprimeNo) (void*);
 } Controle;
 
-int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), void (*imprimeElemento) (void*)){
+int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), void (*imprimeNo) (void*)){
     (*ctrl) = (Controle *) malloc (sizeof(Controle));
     if (*ctrl == NULL) return 0;
 
@@ -20,7 +20,7 @@ int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), 
     (*ctrl)->totalNos = 0;
     (*ctrl)->raiz = NULL;
     (*ctrl)->compara = compara;
-    (*ctrl)->imprimeElemento = imprimeElemento;
+    (*ctrl)->imprimeNo = imprimeNo;
 
     return 1;
 }
@@ -82,23 +82,44 @@ int addNo(Controle *ctrl, void *dados){
     return resultado;
 }
 
-void imprimeArvEmOrdemPt2(Controle *ctrl, No *elemento){
+void imprimeArvEmOrdemR(Controle *ctrl, No *elemento){
     if (!elemento) return;
-    imprimeArvEmOrdemPt2(ctrl, elemento->filhoEsq);
-    ctrl->imprimeElemento(elemento->dados);
-    imprimeArvEmOrdemPt2(ctrl, elemento->filhoDir);
+    imprimeArvEmOrdemR(ctrl, elemento->filhoEsq);
+    ctrl->imprimeNo(elemento->dados);
+    imprimeArvEmOrdemR(ctrl, elemento->filhoDir);
 }
 
 void imprimeArvEmOrdem(Controle *ctrl){
-    imprimeArvEmOrdemPt2(ctrl, ctrl->raiz);
+    imprimeArvEmOrdemR(ctrl, ctrl->raiz);
 }
 
-int editaElemento(Controle *ctrl, void *encontra, void *novosDados){
+int encontraNo(Controle *ctrl, void *encontra){
+    int resultado = 0;
+    int distancia = 0;
+    int comparado;
+    No *noAux = ctrl->raiz;
+
+    while (noAux){
+        comparado = ctrl->compara(noAux->dados, encontra);
+
+        if (comparado ==0){
+            printf("%d Elementos foram percorridos para encontrar o elemento:\n", distancia);
+            ctrl->imprimeNo(noAux->dados);
+            return 1;
+        }
+        if (comparado > 0) noAux = noAux->filhoEsq;
+        else               noAux = noAux->filhoDir;
+        distancia++;
+    }
+    return -1;
+}
+
+int editaNo(Controle *ctrl, void *encontra, void *novosDados){
     No *noAux = ctrl->raiz;
     int comparado;
 
     while (noAux){
-        comparado = ctrl->compara(noAux->dados, novosDados);
+        comparado = ctrl->compara(noAux->dados, encontra);
 
         if (comparado == 0){
             memcpy(novosDados, noAux->dados, ctrl->size);
@@ -110,6 +131,16 @@ int editaElemento(Controle *ctrl, void *encontra, void *novosDados){
     return -1;
 }
 
+No *deletaNoI(Controle *ctrl, No *raiz, void *remov, No *pai, int *resultado){
+    if(!raiz) return NULL;
+    No *noAux = raiz;
+
+    int resultadoComparacao;
+    while(noAux){
+        resultadoComparacao = ctrl->compara(noAux->dados, remov);
+    }
+}
+
 No *deletaNoR(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado){
     if(!arvore) return NULL;
 
@@ -119,7 +150,7 @@ No *deletaNoR(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado){
 
     if      (compara < 0) arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, remov, arvore, resultado);
     else if (compara > 0) arvore->filhoEsq = deletaNoR(ctrl, arvore->filhoEsq, remov, arvore, resultado);
-    else{
+    else if (compara == 0) {
         resultado = 0;
         if (arvore->filhoEsq == NULL){
             arvoreAux = arvore->filhoDir;
@@ -149,26 +180,26 @@ int deletaNo(Controle *ctrl, void *remov){
     return resultado;
 }
 
-int totalElementos(No *raiz){
+int totalNo(No *raiz){
 	if (!raiz) return 0;
-	return 1 + totalElementos(raiz->filhoEsq) + totalElementos (raiz->filhoDir);
+	return 1 + totalNo(raiz->filhoEsq) + totalNo(raiz->filhoDir);
 }
 
-int alturaElemento(No *raiz){
+int alturaNo(No *raiz){
 	if (!raiz) return 0;
 
-	int alturaE = alturaElemento(raiz->filhoEsq);
-	int alturaD = alturaElemento(raiz->filhoDir);
+	int alturaE = alturaNo(raiz->filhoEsq);
+	int alturaD = alturaNo(raiz->filhoDir);
 
 	if (alturaE > alturaD)
 		return 1 + alturaE;
 	return 1 + alturaD;
 }
 
-void maiorElemento(){
+void maiorNo(){
 
 }
 
-void menorElemento(){
+void menorNo(){
 
 }
