@@ -19,17 +19,14 @@ Sair: o programa deve percorrer a árvore usando caminhamento "em ordem" e gerar
 */
 int main(){
     Controle *ctrl;
-    iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeElemento);
-    ctrl = leArquivo(ctrl, "testes.txt");
+    iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeNo);
+    ctrl = leArquivo(ctrl, "entradaBalanceada10.txt");
 
     Aluno *alunoAux = criaAluno(0,"NULL",0);
-    alunoAux->matricula = 10;
-    encontraNo(ctrl,alunoAux);
-    
-    //imprimeArvEmOrdem(ctrl);
+    alunoAux->matricula = 2000000002;
 
-    printf("Pressione enter para finalizar o programa.");
-    getchar();
+    deletaNo(ctrl, alunoAux);
+
     return 0;
 }
 

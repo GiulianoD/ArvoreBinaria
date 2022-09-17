@@ -131,26 +131,91 @@ int editaNo(Controle *ctrl, void *encontra, void *novosDados){
     return -1;
 }
 
-No *deletaNoI(Controle *ctrl, No *raiz, void *remov, No *pai, int *resultado){
+No *deletaNoI(Controle *ctrl, No *raiz, void *remov, int *resultado){
     if(!raiz) return NULL;
     No *noAux = raiz;
+    No *noPai = NULL;
 
-    int resultadoComparacao;
-    while(noAux){
-        resultadoComparacao = ctrl->compara(noAux->dados, remov);
+    int result = ctrl->compara(noAux->dados, remov);
+    
+    while (noAux && result) {
+        noPai = noAux;
+        if (result > 0)
+            noAux = noAux->filhoEsq;
+        else
+            noAux = noAux->filhoDir;
+        if (noAux)
+            result = ctrl->compara(noAux->dados, remov);
     }
+ 
+    if (!noAux) {
+        //se chegou aqui, nao encontrou o No a ser removido
+        printf("Nao foi encontrado nenhum No com o criterio de exclusao.\n");
+        return raiz;
+    }
+    //se chegou aqui, entao encontrou o no a ser deletado
+    //agora precisamos saber quantos filhos ele tem
+    resultado = 0;
+    printf("Dados do aluno excluido:\n");
+    ctrl->imprimeNo(noAux->dados);
+    ctrl->totalNos--;
+    if (!noAux->filhoEsq || !noAux->filhoDir) {
+        No *noNovo;
+        if (!noAux->filhoEsq)
+            noNovo = noAux->filhoDir;
+        else
+            noNovo = noAux->filhoEsq;
+        if (noPai == NULL)
+            return noNovo;
+ 
+        if (noAux == noPai->filhoEsq)
+            noPai->filhoEsq = noNovo;
+        else
+            noPai->filhoDir = noNovo;
+
+        free(noAux);
+        noAux = NULL;
+    }
+
+    //se chegou aqui, entao o No a ser deletado tem 2 filhos
+    else {
+        No *paiTemp = NULL;
+        No *noTemp;
+
+        noTemp = noAux->filhoDir;
+        while (noTemp->filhoEsq) {
+            paiTemp = noTemp;
+            noTemp = noTemp->filhoEsq;
+        }
+ 
+        if (paiTemp)
+            paiTemp->filhoEsq = noTemp->filhoDir;
+ 
+        else
+            noAux->filhoDir = noTemp->filhoDir;
+ 
+        noAux->dados = noTemp->dados;
+        free(noTemp);
+    }
+    return raiz;
 }
 
-No *deletaNoR(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado){
+No *deletaNoR(Controle *ctrl, No *arvore, void *remov, int *resultado){
     if(!arvore) return NULL;
 
     No *arvoreAux = arvore;
 
     int compara = ctrl->compara(arvore->dados, remov);
+    int aindaFaltaRemover = 1;
 
-    if      (compara < 0) arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, remov, arvore, resultado);
-    else if (compara > 0) arvore->filhoEsq = deletaNoR(ctrl, arvore->filhoEsq, remov, arvore, resultado);
+    if      (compara < 0) arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, remov, resultado);
+    else if (compara > 0) arvore->filhoEsq = deletaNoR(ctrl, arvore->filhoEsq, remov, resultado);
     else if (compara == 0) {
+        if (aindaFaltaRemover){
+            aindaFaltaRemover=0;
+            printf("Dados do aluno excluido:\n");
+            ctrl->imprimeNo(arvore->dados);
+        }
         resultado = 0;
         if (arvore->filhoEsq == NULL){
             arvoreAux = arvore->filhoDir;
@@ -169,14 +234,14 @@ No *deletaNoR(Controle *ctrl, No *arvore, void *remov, No *pai, int *resultado){
         No *pontoMinimo = arvore->filhoDir;
         while (pontoMinimo->filhoEsq) pontoMinimo = pontoMinimo->filhoEsq;
         arvore->dados = pontoMinimo->dados;
-        arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, arvore->dados, arvore, resultado);
+        arvore->filhoDir = deletaNoR(ctrl, arvore->filhoDir, arvore->dados, resultado);
     }
     return arvore;
 }
 
 int deletaNo(Controle *ctrl, void *remov){
     int resultado = 0;
-    ctrl->raiz = deletaNoR(ctrl, ctrl->raiz, remov, ctrl->raiz, &resultado);
+    ctrl->raiz = deletaNoI(ctrl, ctrl->raiz, remov, &resultado);
     return resultado;
 }
 
@@ -196,10 +261,18 @@ int alturaNo(No *raiz){
 	return 1 + alturaD;
 }
 
-void maiorNo(){
-
+int maiorNo(Controle *ctrl){
+    No *noAux = ctrl->raiz;
+    if (!noAux) return -1;
+    while (noAux->filhoDir) noAux = noAux->filhoDir;
+    ctrl->imprimeNo(noAux->dados);
+    return 1;
 }
 
-void menorNo(){
-
+int menorNo(Controle *ctrl){
+    No *noAux = ctrl->raiz;
+    if (!noAux) return -1;
+    while (noAux->filhoEsq) noAux = noAux->filhoEsq;
+    ctrl->imprimeNo(noAux->dados);
+    return 1;
 }

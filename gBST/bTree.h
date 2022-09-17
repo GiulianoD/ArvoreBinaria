@@ -11,5 +11,7 @@ int deletaNo(Controle *ctrl, void *remov);
 int totalNo(No *raiz);
 int alturaNo(No *raiz);
 int encontraNo(Controle *ctrl, void *encontra);
+int maiorNo(Controle *ctrl);
+int menorNo(Controle *ctrl);
 
 #endif

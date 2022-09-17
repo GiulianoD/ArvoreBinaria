@@ -22,7 +22,7 @@ int compara(void* a, void* b){
 	return a1->matricula - a2->matricula;
 }
 
-void imprimeElemento(void* a){
+void imprimeNo(void* a){
     Aluno *a1= (Aluno*) a;
     printf("Estudante: %s\n", a1->nome);
     printf("Matricula: %d\n", a1->matricula);
