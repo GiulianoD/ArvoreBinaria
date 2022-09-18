@@ -10,6 +10,7 @@ FILE *abreArq(char *path, char *modo);
 Controle *leArquivo(Controle *ctrl, char *arqNome);
 int menuOpcoes(int *op);
 
+//autor https://github.com/GiulianoD
 int main(){
     Controle *ctrl;
     iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeNo, imprimeNoF);
