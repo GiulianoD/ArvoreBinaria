@@ -14,13 +14,12 @@ int menuOpcoes(int *op);
 int main(){
     Controle *ctrl;
     iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeNo, imprimeNoF);
-    ctrl = leArquivo(ctrl, "entradaBalanceada10.txt");
+    //ctrl = leArquivo(ctrl, "entradaBalanceada10.txt");
     //ctrl = leArquivo(ctrl, "entradaBalanceada200000.txt");
     //ctrl = leArquivo(ctrl, "entradaBalanceada800000.txt");
     //ctrl = leArquivo(ctrl, "entradaBalanceada2500000.txt");
-    //ctrl = leArquivo(ctrl, "arvore.txt");
+    ctrl = leArquivo(ctrl, "entradaOrdenada5000.txt");
     
-    imprimeArvEmNivel(ctrl);
     Aluno *alunoAux = criaAluno(0,"NULL",0);
     int matAux, notaAux;
     char *nomeAux = malloc(30);
