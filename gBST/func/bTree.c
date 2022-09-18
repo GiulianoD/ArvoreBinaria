@@ -10,9 +10,10 @@ typedef struct controle {
     int totalNos;
     int (*compara) (void*,void*);
     void (*imprimeNo) (void*);
+    void (*imprimeNoF) (void*, void*);
 } Controle;
 
-int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), void (*imprimeNo) (void*)){
+int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), void (*imprimeNo) (void*), void (imprimeNoF) (void*,void*)){
     (*ctrl) = (Controle *) malloc (sizeof(Controle));
     if (*ctrl == NULL) return 0;
 
@@ -21,6 +22,7 @@ int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), 
     (*ctrl)->raiz = NULL;
     (*ctrl)->compara = compara;
     (*ctrl)->imprimeNo = imprimeNo;
+    (*ctrl)->imprimeNoF = imprimeNoF;
 
     return 1;
 }
@@ -51,7 +53,7 @@ No *addNoI(Controle *ctrl, No *raiz, void *dados, int *resultado){
             noAux = &(*noAux)->filhoDir;
         }
         else if(resultadoComparacao == 0){
-            //caso entre aqui, entao a matricula a ser inserida, ja existe na arvore
+            printf("Elemento nao inserido na arvore. Ja existe um No que atende ao criterio desejado.\n");
             return raiz;
         }
     }
@@ -82,6 +84,35 @@ int addNo(Controle *ctrl, void *dados){
     return resultado;
 }
 
+// void imprimeArvEmOrdemI(Controle *ctrl, No *elemento){
+//     //No *noAux = ctrl->raiz;
+//     No *s = NULL; // ?
+//     int emExecucao = 1;
+
+//     while (emExecucao){
+//         if (elemento){
+            
+//             elemento = elemento->filhoEsq;
+//         }
+//     }
+// }
+
+int totalNo(No *raiz){
+	if (!raiz) return 0;
+	return 1 + totalNo(raiz->filhoEsq) + totalNo(raiz->filhoDir);
+}
+
+int alturaNo(No *raiz){
+	if (!raiz) return 0;
+
+	int alturaE = alturaNo(raiz->filhoEsq);
+	int alturaD = alturaNo(raiz->filhoDir);
+
+	if (alturaE > alturaD)
+		return 1 + alturaE;
+	return 1 + alturaD;
+}
+
 void imprimeArvEmOrdemR(Controle *ctrl, No *elemento){
     if (!elemento) return;
     imprimeArvEmOrdemR(ctrl, elemento->filhoEsq);
@@ -91,6 +122,22 @@ void imprimeArvEmOrdemR(Controle *ctrl, No *elemento){
 
 void imprimeArvEmOrdem(Controle *ctrl){
     imprimeArvEmOrdemR(ctrl, ctrl->raiz);
+}
+
+void imprimeArvEmNivelAux(Controle *ctrl, No *elemento, int nivel){
+    if (!elemento) return;
+    if (nivel == alturaNo(elemento)){
+        ctrl->imprimeNo(elemento->dados);
+        return;
+    }
+    imprimeArvEmNivelAux(ctrl, elemento->filhoEsq, nivel);
+    imprimeArvEmNivelAux(ctrl, elemento->filhoDir, nivel);
+}
+
+void imprimeArvEmNivel(Controle *ctrl){
+    int nivel = alturaNo(ctrl->raiz);
+    for (; nivel > 0; nivel--)
+        imprimeArvEmNivelAux(ctrl, ctrl->raiz, nivel);
 }
 
 int encontraNo(Controle *ctrl, void *encontra){
@@ -111,6 +158,7 @@ int encontraNo(Controle *ctrl, void *encontra){
         else               noAux = noAux->filhoDir;
         distancia++;
     }
+    printf("Nao foi encontrado nenhum No que atendesse ao criterio de busca.\n");
     return -1;
 }
 
@@ -196,6 +244,7 @@ No *deletaNoI(Controle *ctrl, No *raiz, void *remov, int *resultado){
  
         noAux->dados = noTemp->dados;
         free(noTemp);
+        noTemp = NULL;
     }
     return raiz;
 }
@@ -245,26 +294,11 @@ int deletaNo(Controle *ctrl, void *remov){
     return resultado;
 }
 
-int totalNo(No *raiz){
-	if (!raiz) return 0;
-	return 1 + totalNo(raiz->filhoEsq) + totalNo(raiz->filhoDir);
-}
-
-int alturaNo(No *raiz){
-	if (!raiz) return 0;
-
-	int alturaE = alturaNo(raiz->filhoEsq);
-	int alturaD = alturaNo(raiz->filhoDir);
-
-	if (alturaE > alturaD)
-		return 1 + alturaE;
-	return 1 + alturaD;
-}
-
 int maiorNo(Controle *ctrl){
     No *noAux = ctrl->raiz;
     if (!noAux) return -1;
     while (noAux->filhoDir) noAux = noAux->filhoDir;
+    printf("Dados do maior No encontrado:\n");
     ctrl->imprimeNo(noAux->dados);
     return 1;
 }
@@ -273,6 +307,46 @@ int menorNo(Controle *ctrl){
     No *noAux = ctrl->raiz;
     if (!noAux) return -1;
     while (noAux->filhoEsq) noAux = noAux->filhoEsq;
+    printf("Dados do menor No encontrado:\n");
     ctrl->imprimeNo(noAux->dados);
     return 1;
+}
+
+void salvarArvoreR(Controle *ctrl, No *elemento, FILE *fp){
+    if (!elemento) return;
+    salvarArvoreR(ctrl, elemento->filhoEsq, fp);
+    ctrl->imprimeNoF(elemento->dados, fp);
+    salvarArvoreR(ctrl, elemento->filhoDir, fp);
+}
+
+void salvarArvore(Controle *ctrl){
+    No *noAux = ctrl->raiz;
+    FILE *fp = fopen("arvore.txt","w");
+    fprintf(fp, "%d\n", ctrl->totalNos);
+    salvarArvoreR(ctrl, ctrl->raiz, fp);
+    fclose(fp);
+}
+
+void piorCasoR(Controle *ctrl, No *elemento, int alturaMax, int alturaAtual, int *encontrou){
+    if(alturaAtual ==alturaMax){
+        //encontrou o pior caso
+        printf("Dados do pior caso:\n");
+        ctrl->imprimeNo(elemento->dados);
+        *encontrou = 1;
+        return;
+    }
+    
+    if (elemento->filhoEsq)
+        piorCasoR(ctrl, elemento->filhoEsq, alturaMax, alturaAtual+1, encontrou);
+    
+    if (*encontrou) return;
+    
+    if (elemento->filhoDir)
+        piorCasoR(ctrl, elemento->filhoDir, alturaMax, alturaAtual+1, encontrou);
+
+}
+
+void piorCaso(Controle *ctrl){
+    int encontrou = 0;
+    piorCasoR(ctrl, ctrl->raiz, alturaNo(ctrl->raiz), 1, &encontrou);
 }

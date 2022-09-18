@@ -2,32 +2,82 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bTree.h"
 #include "aluno.h"
+#include "bTree.h"
+#include "garanteInt.c"
 
 FILE *abreArq(char *path, char *modo);
 Controle *leArquivo(Controle *ctrl, char *arqNome);
-/*
-Após a leitura e construção da árvore em memória seu programa deve exibir um menu dando as seguintes opções:
+int menuOpcoes(int *op);
 
-Exibir estatísticas – Deve exibir a quantidade total de elementos, a altura da árvore, o maior e o menor elemento e o pior caso de busca.
-Efetuar busca por matrícula: o programa solicitará a matrícula do aluno, buscará o aluno e imprimirá na tela os dados do aluno (se encontrado) e a quantidade de elementos que foram percorridos até encontrá-lo.  
-Excluir por matrícula: o programa solicitará uma matrícula e excluíra o aluno, imprimindo na tela os dados do aluno excluído ou uma mensagem falando que não o encontrou.
-Incluir aluno: o programa solicitará matrícula, nome e nota do aluno e o incluirá na árvore.
-Sair: o programa deve percorrer a árvore usando caminhamento "em ordem" e gerar um arquivo em que cada linha apresentará a matrícula, o nome e a nota de um aluno, sempre separados por ;. 
-
-*/
 int main(){
     Controle *ctrl;
-    iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeNo);
+    iniciaArvore(&ctrl, sizeof(Aluno), compara, imprimeNo, imprimeNoF);
     ctrl = leArquivo(ctrl, "entradaBalanceada10.txt");
-
+    //ctrl = leArquivo(ctrl, "entradaBalanceada200000.txt");
+    //ctrl = leArquivo(ctrl, "entradaBalanceada800000.txt");
+    //ctrl = leArquivo(ctrl, "entradaBalanceada2500000.txt");
+    //ctrl = leArquivo(ctrl, "arvore.txt");
+    
+    imprimeArvEmNivel(ctrl);
     Aluno *alunoAux = criaAluno(0,"NULL",0);
-    alunoAux->matricula = 2000000002;
+    int matAux, notaAux;
+    char *nomeAux = malloc(30);
 
-    deletaNo(ctrl, alunoAux);
+    int op;
+    do {
+        menuOpcoes(&op);
+        printf("\n");
+        switch (op){
+            case 1:
+                printf("Quantidade total de elementos na arvore: %d\n", ctrl->totalNos);
+                printf("Altura da arvore: %d\n", alturaNo(ctrl->raiz));printf("\n");
+                maiorNo(ctrl);printf("\n");
+                menorNo(ctrl);printf("\n");
+                piorCaso(ctrl);
+                break;
+            case 2:
+                printf("Digite a matricula do aluno que deseja encontrar na arvore: ");
+                alunoAux->matricula = garanteInt();
+                encontraNo(ctrl, alunoAux);
+                break;
+            case 3:
+                printf("Digite a matricula do aluno que deseja excluir da arvore: ");
+                alunoAux->matricula = garanteInt();
+                deletaNo(ctrl, alunoAux);
+                break;
+            case 4:
+                printf("Digite os dados do aluno que deseja incluir.\n");
+                printf("Matricula: ");
+                matAux = garanteInt();
+                printf("Nome: ");
+                scanf("%[^\n]", nomeAux);
+                printf("Nota: ");
+                notaAux = garanteInt();
+                addNo(ctrl, criaAluno(matAux, nomeAux, notaAux));
+                break;
+            case 0:
+                salvarArvore(ctrl);
+                break;
+            default:
+                printf("Digite uma opcao valida.\n");
+        }
+        printf("\n");
+    } while (op);
 
     return 0;
+}
+
+FILE *abreArq(char *path, char *modo){
+    FILE *arq;
+    arq = fopen(path, modo);
+
+    if (!arq){
+        printf("o seguinte arquivo nao foi encontrado encontrado, verifique se o nome esta correto e tente novamente.\n");
+        printf("%s\n", path);
+        exit(1);
+    }
+    return arq;
 }
 
 Controle *leArquivo(Controle *ctrl, char *arqNome){
@@ -41,25 +91,22 @@ Controle *leArquivo(Controle *ctrl, char *arqNome){
 
     fscanf(arq, "%d\n", &totalEsperadoDeElementos);
     while (fscanf(arq, "%d;%[^;];%d\n", &matAux, nomeAux, &notaAux) != -1){
-        //printf("Aluno cadastrado: %s, da matricula: %d, tem a nota %d.\n", nomeAux, matAux, notaAux);
         alunoAux = criaAluno(matAux, nomeAux, notaAux);
         addNo(ctrl, alunoAux);
     }
-    //printf("Total de nos aguardados: %d\n", totalEsperadoDeElementos);
-    //printf("Total de nos  guardados: %d\n", ctrl->totalNos);
-    //printf("Total de nos  da funcao: %d\n", totalNo(ctrl->raiz));
+    
     fclose(arq);
     return ctrl;
 }
 
-FILE *abreArq(char *path, char *modo){
-    FILE *arq;
-    arq = fopen(path, modo);
-
-    if (!arq){
-        printf("o seguinte arquivo nao foi encontrado encontrado, verifique se o nome esta correto e tente novamente.\n");
-        printf("%s\n", path);
-        exit(1);
-    }
-    return arq;
+int menuOpcoes(int *op){
+    printf("----------------------------------------------\n");
+    printf("Menu de opcoes\n");
+    printf("1: Exibir estatisticas\n");
+    printf("2: Efetuar busca por matrIcula\n");
+    printf("3: Excluir por matrIcula\n");
+    printf("4: Incluir aluno\n");
+    printf("0: Sair\n");
+    printf("Digite o valor referente a sua escolha: ");
+    *op = garanteInt();
 }

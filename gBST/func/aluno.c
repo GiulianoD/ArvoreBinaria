@@ -22,9 +22,15 @@ int compara(void* a, void* b){
 	return a1->matricula - a2->matricula;
 }
 
+void imprimeNoF(void *a, void *b){
+    Aluno *a1= (Aluno*) a;
+    FILE *fp = b;
+    fprintf(fp, "%d;%s;%d\n", a1->matricula, a1->nome, a1->nota);
+}
+
 void imprimeNo(void* a){
     Aluno *a1= (Aluno*) a;
-    printf("Estudante: %s\n", a1->nome);
+    printf("Aluno(a): %s\n", a1->nome);
     printf("Matricula: %d\n", a1->matricula);
     printf("Nota: %d\n", a1->nota);
 }
