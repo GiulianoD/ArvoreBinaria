@@ -1,5 +1,3 @@
-//autor giuliano
-//https://github.com/GiulianoD/GenericBST
 # GenericBST
 Generic Binary Search Tree em C
 
