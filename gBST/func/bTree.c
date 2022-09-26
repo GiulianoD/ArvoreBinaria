@@ -103,7 +103,7 @@ int totalNo(No *raiz){
 }
 
 int alturaNo(No *raiz){
-	if (!raiz) return 0;
+	if (!raiz) return -1;
 
 	int alturaE = alturaNo(raiz->filhoEsq);
 	int alturaD = alturaNo(raiz->filhoDir);
