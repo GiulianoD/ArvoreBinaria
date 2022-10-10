@@ -7,8 +7,6 @@
 #include "func/bTree.h"
 #include "func/garanteInt.h"
 
-int debug = 1;
-
 FILE *abreArq(char *path, char *modo);
 Controle *leArquivo(Controle *ctrl, char *arqNome);
 int menuOpcoes(int *op);
