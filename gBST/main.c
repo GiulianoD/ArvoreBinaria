@@ -3,9 +3,11 @@
 #include <string.h>
 #include <time.h>
 
-#include "aluno.h"
-#include "bTree.h"
-#include "garanteInt.c"
+#include "func/aluno.h"
+#include "func/avl.h"
+#include "func/garanteInt.h"
+
+int debug = 1;
 
 FILE *abreArq(char *path, char *modo);
 Controle *leArquivo(Controle *ctrl, char *arqNome);
@@ -24,8 +26,8 @@ int main(){
     inicioExec=clock(); //tempo inicial de alocacao de memoria da arvore
 
     //aloca a arvore na memoria
-    ctrl = leArquivo(ctrl, "entradas/entradaOrdenada30000.txt");
-    
+    ctrl = leArquivo(ctrl, "entradas/entradaAleatoria30000.txt");
+
     fimExec = clock(); //tempo final de alocacao de memoria da arvore
     tempoExec = (double)(fimExec - inicioExec) / CLOCKS_PER_SEC; //converte a diferenca para segundos
     printf("Tempo para alocar a arvore (em segundos): %.4f\n", tempoExec); //imprime quanto tempo levou para executar a acao
@@ -42,9 +44,12 @@ int main(){
         switch (op){
             case 1:
                 inicioExec = clock();
-
                 printf("Quantidade total de elementos na arvore: %d\n", ctrl->totalNos);
                 printf("Altura da arvore: %d\n", alturaNo(ctrl->raiz));printf("\n");
+                if (ctrl->totalNos == 0){
+                    printf("A arvore esta vazia.\n");
+                    break;
+                }
                 maiorNo(ctrl);printf("\n");
                 menorNo(ctrl);printf("\n");
                 piorCaso(ctrl);
@@ -85,7 +90,7 @@ int main(){
                 scanf("%[^\n]", nomeAux);
                 printf("Nota: ");
                 notaAux = garanteInt();
-                addNo(ctrl, criaAluno(matAux, nomeAux, notaAux));
+                addNoAVL(ctrl, criaAluno(matAux, nomeAux, notaAux));
 
                 fimExec = clock();
                 tempoExec = (double)(fimExec - inicioExec) / CLOCKS_PER_SEC;
@@ -123,7 +128,7 @@ FILE *abreArq(char *path, char *modo){
 
 Controle *leArquivo(Controle *ctrl, char *arqNome){
     FILE *arq = abreArq(arqNome,"r");
-    
+
     Aluno *alunoAux;
     int matAux;
     char *nomeAux = (char*) malloc (30);
@@ -133,7 +138,7 @@ Controle *leArquivo(Controle *ctrl, char *arqNome){
     fscanf(arq, "%d\n", &totalEsperadoDeElementos);
     while (fscanf(arq, "%d;%[^;];%d\n", &matAux, nomeAux, &notaAux) != -1){
         alunoAux = criaAluno(matAux, nomeAux, notaAux);
-        addNo(ctrl, alunoAux);
+        addNoAVL(ctrl, alunoAux);
     }
     
     fclose(arq);

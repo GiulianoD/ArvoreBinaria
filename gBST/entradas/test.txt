@@ -1,0 +1,11 @@
+10
+5;Hako Bese;81
+2;Nol Pir;92
+1;Kefo Gucemiv;49
+3;Ponitai Jagu;62
+4;Utepequ Utuy;79
+8;Tale Mik;17
+6;Gozi Obu;100
+7;Meu Noifedin;49
+9;Atihi Tefoamak;20
+10;Vesutog Forom;82

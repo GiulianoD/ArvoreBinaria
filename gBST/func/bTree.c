@@ -1,17 +1,4 @@
-typedef struct no {
-    void *dados;
-    struct no *filhoEsq, *filhoDir;
-} No;
-
-typedef struct controle {
-    No *raiz;
-    size_t size; //esta variavel representa o tamanho padrao dos dados a serem guardados por cada no
-    int altura;
-    int totalNos;
-    int (*compara) (void*,void*);
-    void (*imprimeNo) (void*);
-    void (*imprimeNoF) (void*, void*);
-} Controle;
+#include "bTree.h"
 
 int iniciaArvore(Controle **ctrl, size_t tamanho, int (*compara) (void*,void*), void (*imprimeNo) (void*), void (imprimeNoF) (void*,void*)){
     (*ctrl) = (Controle *) malloc (sizeof(Controle));
@@ -136,7 +123,8 @@ void imprimeArvEmNivelAux(Controle *ctrl, No *elemento, int nivel){
 
 void imprimeArvEmNivel(Controle *ctrl){
     int nivel = alturaNo(ctrl->raiz);
-    for (; nivel > 0; nivel--)
+
+    for (;nivel >= 0; nivel--)
         imprimeArvEmNivelAux(ctrl, ctrl->raiz, nivel);
 }
 

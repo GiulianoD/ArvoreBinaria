@@ -1,9 +1,4 @@
-typedef struct aluno
-{
-	int matricula;
-    char *nome;
-    int nota;
-}Aluno;
+#include "aluno.h"
 
 Aluno *criaAluno(int mat, char *nome, int nota){
     Aluno *novoAluno = (Aluno *) malloc (sizeof(Aluno));
@@ -30,6 +25,7 @@ void imprimeNoF(void *a, void *b){
 
 void imprimeNo(void* a){
     Aluno *a1= (Aluno*) a;
+
     printf("Aluno(a): %s\n", a1->nome);
     printf("Matricula: %d\n", a1->matricula);
     printf("Nota: %d\n", a1->nota);

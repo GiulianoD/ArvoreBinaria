@@ -1,0 +1,15 @@
+avl + reformulação da estrutura geral
+
+criada a biblioteca AVL, contendo uma nova função de adicionar nó
+-esta função depende de outras novas funções também implementadas, referentes aos balanceamento dos nós
+
+-structs passam a ser parte dos arquivos header (.h)
+-arquivos de funções passam a invocar seus headers por #include
+-a função garanteInt agora tem header
+-todos os headers foram transferidos para dentro da pasta /func
+
+correção de erro
+-ao imprimir as estatísticas, o programa reconhece quando a arvore está vazia e não procura mais pelos nós
+
+novo gerador de arquivo
+-com opção de gerar lista aleatoria (além das opções anteriores: ordenada e balanceada)

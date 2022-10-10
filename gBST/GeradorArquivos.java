@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package geradorarquivos;
 
 import java.io.FileWriter;
@@ -17,7 +22,7 @@ public class GeradorArquivos {
     final Random rand = new Random();
     final int matriculaBase = 2000000000;
     
-    private enum TipoArquivo{ORDENADO, BALANCEADO;};
+    private enum TipoArquivo{ORDENADO, BALANCEADO, ALEATORIO;};
     
     private boolean ehVogal (char c){
         for (char l: vogais){
@@ -40,6 +45,7 @@ public class GeradorArquivos {
             return (char) ('A'+rand.nextInt(26));
     }
 
+    
     private String geraPalavra(int tam){
         int cont;
         String palavra = "";
@@ -84,8 +90,8 @@ public class GeradorArquivos {
     }
     
     public void geraArqBalanceado(int n){
-        //int i,nota,matricula= 2000000000;
-        //String nome;
+        int i,nota,matricula= 2000000000;
+        String nome;
         
         FileWriter arq;
         try {
@@ -99,6 +105,36 @@ public class GeradorArquivos {
         }        
         
     }
+    
+     public void geraArqAleatorio(int n){
+        int i,nota,matricula= matriculaBase, maxMat= 100000000,offset;
+        boolean gerados[] = new boolean[maxMat];
+        String nome;
+         System.out.println(gerados[0]);
+         System.out.println(gerados[maxMat-1]);
+        FileWriter arq;
+        try {
+            arq = new FileWriter("entradaAleatoria"+n+".txt");
+            PrintWriter gravarArq = new PrintWriter(arq);
+            gravarArq.println(n);
+            for(i=1;i<=n;i++){
+                offset = rand.nextInt(maxMat);
+                matricula= matriculaBase + offset;
+                while(gerados[offset]){
+                    offset = rand.nextInt(maxMat);
+                    matricula= matriculaBase + offset;
+                };
+                gerados[offset]=true;
+                nome = geraNomeCompleto();
+                nota = 10 + rand.nextInt(91);
+                gravarArq.printf("%d;%s;%d%n",matricula, nome, nota);
+            }
+            arq.close();
+        } catch (IOException ex) {
+            Logger.getLogger(GeradorArquivos.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+    }
+
     
     private void geraBalanceado(int min, int max,PrintWriter gravarArq){
         if (min <= max){
@@ -119,6 +155,9 @@ public class GeradorArquivos {
                break;
            case BALANCEADO: 
                geraArqBalanceado(tam);
+               break;
+           case ALEATORIO: 
+               geraArqAleatorio(tam);
                break;   
        }
     }
@@ -132,9 +171,9 @@ public class GeradorArquivos {
         tam a quantidade de registros que deseja e passar definir o tipo de arquivo
         que pode ser ORDENADO ou BALANCEADO*/
         
-        int TAM = 200000;
-        long tempoInicial = System. currentTimeMillis();
-        g.geraArquivo(TAM,TipoArquivo.BALANCEADO);
+        int TAM = 300000;
+        long tempoInicial = System. currentTimeMillis();        
+        g.geraArquivo(TAM,TipoArquivo.ALEATORIO);
         long tempoFinal = System. currentTimeMillis();
         
         System.out.println("Tempo Total de geração do arquivo em ms: " + (tempoFinal - tempoInicial));
