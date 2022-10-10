@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include "func/aluno.h"
-#include "func/avl.h"
+#include "func/bTree.h"
 #include "func/garanteInt.h"
 
 int debug = 1;
@@ -90,7 +90,7 @@ int main(){
                 scanf("%[^\n]", nomeAux);
                 printf("Nota: ");
                 notaAux = garanteInt();
-                addNoAVL(ctrl, criaAluno(matAux, nomeAux, notaAux));
+                addNo(ctrl, criaAluno(matAux, nomeAux, notaAux));
 
                 fimExec = clock();
                 tempoExec = (double)(fimExec - inicioExec) / CLOCKS_PER_SEC;
@@ -138,7 +138,7 @@ Controle *leArquivo(Controle *ctrl, char *arqNome){
     fscanf(arq, "%d\n", &totalEsperadoDeElementos);
     while (fscanf(arq, "%d;%[^;];%d\n", &matAux, nomeAux, &notaAux) != -1){
         alunoAux = criaAluno(matAux, nomeAux, notaAux);
-        addNoAVL(ctrl, alunoAux);
+        addNo(ctrl, alunoAux);
     }
     
     fclose(arq);
